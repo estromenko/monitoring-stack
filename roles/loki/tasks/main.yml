@@ -1,0 +1,40 @@
+---
+- name: Create /etc/loki directory for Loki
+  become: true
+  become_user: root
+  ansible.builtin.file:
+    path: /etc/loki
+    state: directory
+    group: docker
+    mode: "0777"
+
+- name: Create /var/lib/loki directory for Loki
+  become: true
+  become_user: root
+  ansible.builtin.file:
+    path: /var/lib/loki
+    state: directory
+    group: docker
+    mode: "0777"
+
+- name: Create Loki config
+  become: true
+  become_user: root
+  ansible.builtin.template:
+    src: loki-config.yml.j2
+    dest: /etc/loki/loki-config.yml
+    mode: "0777"
+    group: docker
+
+- name: Install Loki
+  changed_when: false
+  ansible.builtin.shell: |
+    docker rm loki -f || true
+    docker run -d \
+      --name loki \
+      --restart unless-stopped \
+      --net host \
+      -v /etc/loki:/etc/loki \
+      -v /var/lib/loki:/var/lib/loki \
+      grafana/loki:3.0.0 \
+      -config.file=/etc/loki/loki-config.yml

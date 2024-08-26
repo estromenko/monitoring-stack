@@ -1,0 +1,44 @@
+---
+- name: Create /var/lib/prometheus directory for Prometheus
+  become: true
+  become_user: root
+  ansible.builtin.file:
+    path: /var/lib/prometheus
+    state: directory
+    group: docker
+    mode: "0777"
+
+- name: Create scrapes directory for Prometheus
+  become: true
+  become_user: root
+  ansible.builtin.file:
+    path: /etc/prometheus/scrapes
+    state: directory
+    group: docker
+    mode: "0777"
+    recurse: true
+
+- name: Prepare Prometheus config
+  become: true
+  become_user: root
+  ansible.builtin.template:
+    src: "prometheus.yml.j2"
+    mode: "0777"
+    dest: /etc/prometheus/prometheus.yml
+    group: docker
+
+- name: Run Prometheus container
+  changed_when: false
+  ansible.builtin.shell: |
+    docker rm prometheus -f || true
+    docker run -d \
+      --name prometheus \
+      --restart unless-stopped \
+      --net host \
+      -v /etc/prometheus:/etc/prometheus \
+      -v /var/lib/prometheus:/prometheus \
+      --log-driver=loki \
+      --log-opt loki-url="{{ loki_url }}" \
+      --log-opt loki-retries=5 \
+      --log-opt loki-batch-size=400 \
+      prom/prometheus:latest

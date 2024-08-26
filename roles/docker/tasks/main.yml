@@ -1,0 +1,17 @@
+---
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Install Docker package
+  become: true
+  become_user: root
+  when: services['docker.service'].status != "enabled"
+  ansible.builtin.package:
+    name: docker.io
+    state: present
+
+- name: Install Docker Loki plugin
+  become: true
+  become_user: root
+  ansible.builtin.shell: |
+    docker plugin install grafana/loki-docker-driver:2.9.2 --alias loki --grant-all-permissions || true

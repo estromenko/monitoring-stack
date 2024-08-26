@@ -1,0 +1,37 @@
+---
+- name: Create /etc/promtail directory for Promtail
+  become: true
+  become_user: root
+  ansible.builtin.file:
+    path: /etc/promtail
+    state: directory
+    group: docker
+    mode: "0777"
+
+- name: Create Promtail config
+  become: true
+  become_user: root
+  ansible.builtin.template:
+    src: promtail-config.yml.j2
+    dest: /etc/promtail/promtail-config.yml
+    mode: "0777"
+    group: docker
+
+- name: Install Promtail
+  changed_when: false
+  become: true
+  become_user: root
+  ansible.builtin.shell: |
+    docker rm promtail -f || true
+    docker run -d \
+      --name promtail \
+      --restart unless-stopped \
+      --net host \
+      --log-driver=loki \
+      --log-opt loki-url="{{ loki_url }}" \
+      --log-opt loki-retries=5 \
+      --log-opt loki-batch-size=400 \
+      -v /etc/promtail:/etc/promtail \
+      -v /var/log:/var/log \
+      grafana/promtail:3.0.0 \
+      -config.file=/etc/promtail/promtail-config.yml

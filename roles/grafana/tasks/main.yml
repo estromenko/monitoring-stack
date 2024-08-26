@@ -1,0 +1,24 @@
+---
+- name: Create /var/lib/grafana directory for Grafana
+  become: true
+  become_user: root
+  ansible.builtin.file:
+    path: /var/lib/grafana
+    state: directory
+    group: docker
+    mode: "0777"
+
+- name: Run Grafana container
+  changed_when: false
+  ansible.builtin.shell: |
+    docker rm grafana -f || true
+    docker run -d \
+      --name grafana \
+      --restart unless-stopped \
+      --net host \
+      --log-driver=loki \
+      --log-opt loki-url="{{ loki_url }}" \
+      --log-opt loki-retries=5 \
+      --log-opt loki-batch-size=400 \
+      -v /var/lib/grafana:/var/lib/grafana \
+      grafana/grafana-oss:latest
