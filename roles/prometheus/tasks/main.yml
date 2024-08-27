@@ -41,4 +41,4 @@
       --log-opt loki-url="{{ loki_url }}" \
       --log-opt loki-retries=5 \
       --log-opt loki-batch-size=400 \
-      prom/prometheus:latest
+      {{ images.prometheus }} 

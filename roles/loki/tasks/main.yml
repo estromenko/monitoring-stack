@@ -36,5 +36,5 @@
       --net host \
       -v /etc/loki:/etc/loki \
       -v /var/lib/loki:/var/lib/loki \
-      grafana/loki:3.0.0 \
+      {{ images.loki }} \
       -config.file=/etc/loki/loki-config.yml

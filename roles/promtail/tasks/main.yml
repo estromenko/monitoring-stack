@@ -33,5 +33,5 @@
       --log-opt loki-batch-size=400 \
       -v /etc/promtail:/etc/promtail \
       -v /var/log:/var/log \
-      grafana/promtail:3.0.0 \
+      {{ images.promtail }} \
       -config.file=/etc/promtail/promtail-config.yml

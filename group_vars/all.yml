@@ -1,2 +1,8 @@
 ---
 loki_url: http://{{ groups['manager'][0] }}:3100/loki/api/v1/push
+images:
+  grafana: grafana/grafana-oss:11.1.4
+  loki: grafana/loki:3.0.1
+  node_exporter: prom/node-exporter:v1.8.2
+  prometheus: prom/prometheus:v2.53.2
+  promtail: grafana/promtail:3.0.1

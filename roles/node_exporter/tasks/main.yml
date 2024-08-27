@@ -13,7 +13,7 @@
       --log-opt loki-url="{{ loki_url }}" \
       --log-opt loki-retries=5 \
       --log-opt loki-batch-size=400 \
-      quay.io/prometheus/node-exporter:latest \
+      {{ images.node_exporter }} \
       --path.rootfs=/host
   
 - name: Add extra prometheus configs

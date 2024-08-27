@@ -21,4 +21,4 @@
       --log-opt loki-retries=5 \
       --log-opt loki-batch-size=400 \
       -v /var/lib/grafana:/var/lib/grafana \
-      grafana/grafana-oss:latest
+      {{ images.grafana }}
